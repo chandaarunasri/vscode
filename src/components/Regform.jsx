@@ -1,91 +1,148 @@
 import React, { useState } from "react";
 
-function Regform() {
+export default function RegistrationForm() {
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
+    confirmPassword: "",
   });
 
-  function Change(e) {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  }
+  const [errors, setErrors] = useState({});
 
-  function handleSubmit(e) {
-    e.preventDefault();
+  // handle input changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
+  // validation
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format";
     }
 
-    console.log("Registration Data:", formData);
-    alert("Registration Successful!");
-  }
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    if (formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    return newErrors;
+  };
+
+  // form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      alert("🎉 Registration Successful!");
+      console.log("User Data:", formData);
+
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+        confirmPassword: "",
+      });
+    }
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg rounded-2xl p-8 w-96"
+        className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md"
       >
-        <h2 className="text-2xl font-bold text-center text-green-5 00 mb-6">
-          Registration
+        <h2 className="text-2xl font-bold text-center mb-6 text-blue-600">
+          Registration Form
         </h2>
 
-
+        {/* Name */}
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Username</label>
+          <label className="block font-medium mb-1">Name</label>
           <input
             type="text"
-            name="username"
-            value={formData.username}
-            onChange={Change}
-            placeholder="Enter your username"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-            required
+            name="name"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="Enter your name"
           />
+          {errors.name && (
+            <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+          )}
         </div>
 
-
+        {/* Email */}
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Email</label>
+          <label className="block font-medium mb-1">Email</label>
           <input
             type="email"
             name="email"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-            required
           />
+          {errors.email && (
+            <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+          )}
         </div>
 
-      
+        {/* Password */}
         <div className="mb-4">
-          <label className="block text-gray-700 mb-2">Password</label>
+          <label className="block font-medium mb-1">Password</label>
           <input
             type="password"
             name="password"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             value={formData.password}
             onChange={handleChange}
-            placeholder="Enter your password"
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-            required
+            placeholder="Enter password"
           />
+          {errors.password && (
+            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+          )}
         </div>
 
-        
+        {/* Confirm Password */}
+        <div className="mb-6">
+          <label className="block font-medium mb-1">Confirm Password</label>
+          <input
+            type="password"
+            name="confirmPassword"
+            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="Re-enter password"
+          />
+          {errors.confirmPassword && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.confirmPassword}
+            </p>
+          )}
+        </div>
+
+        {/* Submit Button */}
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
+          className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200"
         >
-          Submit
+          Register
         </button>
       </form>
     </div>
   );
 }
-
-export default Regform;
